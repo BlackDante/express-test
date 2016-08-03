@@ -1,0 +1,70 @@
+#!/usr/bin/env node
+/*eslint no-process-exit: 0*/
+
+/**
+ * Module dependencies.
+ */
+const app = require('../app');
+const debug = require('debug')('express-server:server');
+const http = require('http');
+
+const DEFAULT_PORT = 3000;
+const EXIT_ERROR = 1;
+
+/**
+ * Get port from environment and store in Express.
+ */
+const port = process.env.PORT || DEFAULT_PORT;
+app.set('port', port);
+
+/**
+ * Create HTTP server.
+ */
+const server = http.createServer(app);
+
+/**
+ * Event listener for HTTP server "error" event.
+ *
+ * @param {Object} error Obiekt błędu
+ * @returns {undefined}
+ */
+function onError(error) {
+  if (error.syscall !== 'listen') {
+    throw error;
+  }
+
+  // handle specific listen errors with friendly messages
+  switch (error.code) {
+  case 'EACCES':
+    process.exit(EXIT_ERROR);
+    break;
+
+  case 'EADDRINUSE':
+    process.exit(EXIT_ERROR);
+    break;
+
+  default:
+    throw error;
+  }
+}
+
+/**
+ * Event listener for HTTP server "listening" event.
+ *
+ * @returns {undefined}
+ */
+function onListening() {
+  const addr = server.address();
+  const bind = typeof addr === 'string'
+    ? `pipe ${addr}`
+    : `port ${addr.port}`;
+  debug(`Listening on ${bind}`);
+}
+
+/**
+ * Listen on provided port, on all network interfaces.
+ */
+
+server.listen(port);
+server.on('error', onError);
+server.on('listening', onListening);
