@@ -3,10 +3,12 @@
   extends: [eslint:recommended, plugin:node/recommended],
   env: {
     es6: true,
-    node: true
+    node: true,
+    mocha: true,
   },
   rules: {
     "node/shebang": 0,
+    "node/no-unpublished-require": 0,
     require-jsdoc: 2,
     prefer-arrow-callback: 2,
     prefer-const: 2,
