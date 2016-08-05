@@ -16,9 +16,13 @@ const db = require('./modules/database/database');
 const app = express();
 
 // connect to mongoDB
-db.connect().then(() => {
-  debug('Database connected');
-});
+db.connect()
+  .then(() => {
+    debug('Database connected');
+  })
+  .catch((error) => {
+    debug(error);
+  });
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
