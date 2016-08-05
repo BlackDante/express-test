@@ -4,14 +4,21 @@ const path = require('path');
 const logger = require('morgan');
 const cookieParser = require('cookie-parser');
 const bodyParser = require('body-parser');
-const helmet = require('helmet')
+const helmet = require('helmet');
+const httpCodes = require('http-codes');
+const debug = require('debug')('express-server:database');
 
 const routes = require('./routes/index');
 const users = require('./routes/users');
 
-const httpCodes = require('http-codes');
+const db = require('./modules/database/database');
 
 const app = express();
+
+// connect to mongoDB
+db.connect().then(() => {
+  debug('Database connected');
+});
 
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
