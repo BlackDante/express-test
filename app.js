@@ -11,8 +11,8 @@ const passport = require('passport');
 const session = require('express-session');
 const LocalStrategy = require('passport-local').Strategy;
 
-const routes = require('./routes/index');
-const users = require('./routes/users');
+// const routes = require('./routes/index');
+// const users = require('./routes/users');
 const auths = require('./routes/auth');
 
 const db = require('./modules/database/database');
