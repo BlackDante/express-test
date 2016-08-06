@@ -13,6 +13,7 @@ const LocalStrategy = require('passport-local').Strategy;
 
 const routes = require('./routes/index');
 const users = require('./routes/users');
+const auths = require('./routes/auth');
 
 const db = require('./modules/database/database');
 
@@ -20,40 +21,12 @@ const User = require('./models/user');
 
 const app = express();
 
-passport.serializeUser((user, done) => {
-  done(null, user.id);
-});
+// use static authenticate method of model in LocalStrategy
+passport.use(new LocalStrategy(User.authenticate()));
 
-passport.deserializeUser((id, done) => {
-  User.findById(id, function(err, user) {
-    done(err, user);
-  });
-});
-
-passport.use(new LocalStrategy((username, password, done) => {
-  User.findOne({ username }, (err, user) => {
-    if (err)
-      return done(err);
-    if (!user)
-      return done(null, false, { message: 'Incorrect username.' });
-    if (!user.validPassword(password))
-      return done(null, false, { message: 'Incorrect password.' });
-
-    return done(null, user);
-  });
-}));
-
-passport.use('signup', new LocalStrategy({
-  passRequestToCallback: true
-}, (req, username, password, done) => {
-  console.log('test');
-  function findOrCreateUser() {
-    console.log(username, password);
-    done(null, {});
-  }
-
-  process.nextTick(findOrCreateUser);
-}));
+// use static serialize and deserialize of model for passport session support
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 // connect to mongoDB
 db.connect()
@@ -86,13 +59,10 @@ app.use(session({
 app.use(passport.initialize()) ;
 app.use(passport.session());
 
-app.use('/', routes);
-app.use('/users', users);
+// app.use('/', routes);
+// app.use('/users', users);
 
-app.post('/signup', passport.authenticate('signup', {
-  successRedirect: '/',
-  failureRedirect: '/signup'
-}));
+app.use('/', auths);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {

@@ -10,7 +10,7 @@
     "start:dev": "nodemon ./bin/www",
     "start:prod": "pm2 start ./bin/www",
     "test": "npm run test:unit && npm run test:integration",
-    "test:unit": "NODE_ENV=test mocha -R spec tests/unit-test/test.spec.js",
+    "test:unit": "NODE_ENV=test mocha -R spec tests/unit-test/*.spec.js",
     "test:integration": "NODE_ENV=test mocha -R spec tests/integration/test.spec.js"
   },
   "dependencies": {
