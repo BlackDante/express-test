@@ -7,13 +7,26 @@ const bodyParser = require('body-parser');
 const helmet = require('helmet');
 const httpCodes = require('http-codes');
 const debug = require('debug')('express-server:database');
+const passport = require('passport');
+const session = require('express-session');
+const LocalStrategy = require('passport-local').Strategy;
 
-const routes = require('./routes/index');
-const users = require('./routes/users');
+// const routes = require('./routes/index');
+// const users = require('./routes/users');
+const auths = require('./routes/auth');
 
 const db = require('./modules/database/database');
 
+const User = require('./models/user');
+
 const app = express();
+
+// use static authenticate method of model in LocalStrategy
+passport.use(new LocalStrategy(User.authenticate()));
+
+// use static serialize and deserialize of model for passport session support
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
 
 // connect to mongoDB
 db.connect()
@@ -37,8 +50,19 @@ app.use(cookieParser());
 app.use(helmet());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', routes);
-app.use('/users', users);
+app.use(session({
+  secret: 'mySecretKey',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}));
+app.use(passport.initialize()) ;
+app.use(passport.session());
+
+// app.use('/', routes);
+// app.use('/users', users);
+
+app.use('/', auths);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
@@ -70,6 +94,5 @@ app.use((err, req, res) => {
     error: {}
   });
 });
-
 
 module.exports = app;
